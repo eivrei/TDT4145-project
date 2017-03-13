@@ -1,38 +1,77 @@
 
 import java.util.Date;
-import java.util.Time;
-import java.s
+import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.sql.Connection;
+import java.sql.Statement;
+import java.sql.ResultSet;
+
 
 
 
 
 public class Workout{
 
-    private Date date;
+    private Date dato;
     private int varighet;
     private int personligform;
-    private int prestasjon
-    private Time startTidspunkt;
+    private int prestasjon;
+    private LocalTime startTidspunkt;
     private String mal;
     private String maal;
-    private String formal/tips;
-    private int luft/ventilasjon;
+    private String formal_tips;
+    private int luft_ventilasjon;
     private int antTilskuere;
     private int temperatur;
     private String værForhold;
 
-    public Workout(Date date, Time startTidspunkt) {
-        this.date = date;
+
+    public Workout(Date date, LocalTime startTidspunkt) {
+        this.dato = date;
         this.startTidspunkt = startTidspunkt;
+    }
+
+    public void initialize (Connection conn) {
+        try {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("select dato, varighet from Treningsøkt where dato=" + dato);
+            while (rs.next()) {
+                dato =  rs.getDate("dato");
+                varighet = rs.getInt("varighet");
+            }
+
+        } catch (Exception e) {
+            System.out.println("db error during select of treningsøkt= "+e);
+            return;
+        }
+
+    }
+
+    public void refresh (Connection conn) {
+        initialize (conn);
+    }
+
+    public String save (Connection conn) throws Exception {
+        try {
+            Statement stmt = conn.createStatement();
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String fDato = df.format(dato);
+            //kan bygge opp string i forkant for å lage en 'modulær' string
+            stmt.executeUpdate("insert into Treningsøkt values ('"+fDato+"',"+varighet+",'"+personligform+"','"+formal_tips+"','"+mal+"','"+værForhold+"',"+temperatur+","+antTilskuere+",'"+luft_ventilasjon+"');");
+            return fDato;
+        } catch (Exception e) {
+            System.out.println("db error during insert of Treningsøkt="+e);
+            throw new Exception();
+        }
     }
 
 
     public Date getDate(){
-        return date;
+        return dato;
     }
 
     public void setDate(Date date) {
-        this.date=date;
+        this.dato=date;
     }
 
     public int getVarighet() {
@@ -59,11 +98,11 @@ public class Workout{
         this.prestasjon = prestasjon;
     }
 
-    public Time getStartTidspunkt() {
+    public LocalTime getStartTidspunkt() {
         return startTidspunkt;
     }
 
-    public void setStartTidspunkt(Time startTidspunkt) {
+    public void setStartTidspunkt(LocalTime startTidspunkt) {
         this.startTidspunkt = startTidspunkt;
     }
 
@@ -84,19 +123,19 @@ public class Workout{
     }
 
     public String getFormal() {
-        return formal;
+        return formal_tips;
     }
 
-    public void setFormal(String formal) {
-        this.formal = formal;
+    public void setFormal(String formal_tips) {
+        this.formal_tips = formal_tips;
     }
 
     public int getLuft() {
-        return luft;
+        return luft_ventilasjon;
     }
 
-    public void setLuft(int luft) {
-        this.luft = luft;
+    public void setLuft(int luft_ventilasjon) {
+        this.luft_ventilasjon = luft_ventilasjon;
     }
 
     public int getAntTilskuere() {
