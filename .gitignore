@@ -88,5 +88,6 @@ ENV/
 # Rope project settings
 .ropeproject
 
-# Jetbrains
+# User specific files
 .idea/*
+.DS_Store
