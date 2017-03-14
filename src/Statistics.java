@@ -1,4 +1,6 @@
 
+import sun.java2d.pipe.SpanShapeRenderer;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -7,13 +9,13 @@ import java.util.Date;
 
 public class Statistics extends Connector{
 
-    public void getTopResultStrenght(int øvelses_id, Date startDato, Date sluttDato) {
+    public void getTopResultStrenght(int ovelseId, String startDato, String sluttDato) {
 
         try {
             Statement statement=conn.createStatement();
-            ResultSet rs=statement.executeQuery("select dato, belastning,antallRep,antallSet from Resultat where øvelses_id="+øvelses_id+" and Treningsokt>'"+startDato+"' and Treningsokt<'"+sluttDato+"' and belastning IS NOT NULL"+"order by belastning ;");
+            ResultSet rs=statement.executeQuery("select dato, belastning,antallRep,antallSett from Resultat where ovelseId='"+ovelseId+"' and dato BETWEEN '"+startDato+"' and '"+sluttDato+"' and belastning IS NOT NULL order by belastning ;");
             while (rs.next()){
-                System.out.println("{" + rs.getDate("dato") + "|" + rs.getInt("belastning") + "|" + rs.getInt("antallRep") + "|" + rs.getInt("antallSet") + "}");
+                System.out.println("{" + rs.getDate("dato") + "|" + rs.getInt("belastning") + "|" + rs.getInt("antallRep") + "|" + rs.getInt("antallSett") + "}");
             }
 
         }
@@ -23,13 +25,13 @@ public class Statistics extends Connector{
         }
     }
 
-    public void getTopResultrunning(int øvelses_id,Date startDato, Date sluttDato) {
+    public void getTopResultrunning(int ovelseId, String startDato, String sluttDato) {
 
         try {
             Statement statement=conn.createStatement();
-            ResultSet rs=statement.executeQuery("select dato,varighet,distanse from Resultat where øvelses_id="+øvelses_id+" and Treningsokt>'"+startDato+"' and Treningsokt<'"+sluttDato+"' and distanse IS NOT NULL"+"order by distanse ;");
+            ResultSet rs=statement.executeQuery("select dato,varighet,distanse from Resultat where ovelseId='"+ovelseId+"' and dato BETWEEN '"+startDato+"' and'"+sluttDato+"' and distanse IS NOT NULL order by distanse ;");
             while (rs.next()) {
-                System.out.println("{" + rs.getDate("dato") + "|" + rs.getInt("varighet") + "|" + rs.getInt("distanse"));
+                System.out.println("{" + rs.getDate("dato") + "|" + rs.getInt("varighet") + "|" + rs.getInt("distanse") + "}");
             }
         }
 
@@ -42,18 +44,18 @@ public class Statistics extends Connector{
     }
 
 
-    public void getStatistics(Date startDato, Date sluttDato) {
+    public void getStatistics(String startDato, String sluttDato) {
 
         try {
             Statement statement=conn.createStatement();
-            ResultSet rs=statement.executeQuery("select SUM (varighet) from Resultat where Treningsokt>'"+startDato+"' and Treningsokt< sluttDato ;");
+            ResultSet rs=statement.executeQuery("select SUM(varighet) from Treningsokt where dato BETWEEN '"+startDato+"' and '"+sluttDato+"' ;");
             int sumVarighet=0;
             while(rs.next()) {
                 int i=rs.getInt(1);
                 sumVarighet+= i;
             }
 
-            System.out.println("I Perioden " + startDato + "til " + sluttDato + " har du trent i " + sumVarighet +"minutter");
+            System.out.println("I Perioden " + startDato + " til " + sluttDato + " har du trent i " + sumVarighet +" minutter.");
 
         }
 
@@ -62,5 +64,12 @@ public class Statistics extends Connector{
         }
     }
 
+    public static void main(String[] args) {
+        Statistics test = new Statistics();
+        test.connect();
+        test.getStatistics("2017.03.01","2017.04.01");
+        test.getTopResultrunning(5, "2017.03.01", "2017.04.01");
+        test.getTopResultStrenght(2, "2017.03.01", "2017.04.01");
+    }
 
 }
