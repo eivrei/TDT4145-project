@@ -1,7 +1,6 @@
 
 import java.util.Date;
 import java.text.SimpleDateFormat;
-import java.time.LocalTime;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
@@ -16,7 +15,7 @@ public class Workout{
     private int varighet;
     private int personligform;
     private int prestasjon;
-    private LocalTime startTidspunkt;
+    private String startTidspunkt;
     private String mal;
     private String maal;
     private String formal_tips;
@@ -26,7 +25,7 @@ public class Workout{
     private String værForhold;
 
 
-    public Workout(Date date, LocalTime startTidspunkt) {
+    public Workout(Date date, String startTidspunkt) {
         this.dato = date;
         this.startTidspunkt = startTidspunkt;
     }
@@ -34,10 +33,10 @@ public class Workout{
     public void initialize (Connection conn) {
         try {
             Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("select dato, varighet from Treningsøkt where dato=" + dato);
+            ResultSet rs = stmt.executeQuery("select dato, startTidspunkt from Treningsøkt where dato=" + dato);
             while (rs.next()) {
                 dato =  rs.getDate("dato");
-                varighet = rs.getInt("varighet");
+                startTidspunkt = rs.getString("startTidspunkt");
             }
 
         } catch (Exception e) {
@@ -54,9 +53,8 @@ public class Workout{
     public String save (Connection conn) throws Exception {
         try {
             Statement stmt = conn.createStatement();
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String fDato = df.format(dato);
-            //kan bygge opp string i forkant for å lage en 'modulær' string
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String fDato = formatter.format(dato);
             stmt.executeUpdate("insert into Treningsøkt values ('"+fDato+"',"+varighet+",'"+personligform+"','"+formal_tips+"','"+mal+"','"+værForhold+"',"+temperatur+","+antTilskuere+",'"+luft_ventilasjon+"');");
             return fDato;
         } catch (Exception e) {
@@ -98,11 +96,11 @@ public class Workout{
         this.prestasjon = prestasjon;
     }
 
-    public LocalTime getStartTidspunkt() {
+    public String getStartTidspunkt() {
         return startTidspunkt;
     }
 
-    public void setStartTidspunkt(LocalTime startTidspunkt) {
+    public void setStartTidspunkt(String startTidspunkt) {
         this.startTidspunkt = startTidspunkt;
     }
 
