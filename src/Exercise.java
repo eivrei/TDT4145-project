@@ -1,5 +1,7 @@
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.Types;
 
 public class Exercise extends Connector{
 
@@ -14,9 +16,31 @@ public class Exercise extends Connector{
     private String øvelsesGruppe;
     private String type;
 
+    // For hentOvelse
     public Exercise(int ovelseId, String type){
         this.ovelseId = ovelseId;
         this.type = type;
+    }
+
+    // For lagStyrkeOvelse
+    public Exercise(String type, String navn, String beskrivelse, int belastning, int antallRep, int antallSet){
+        this.type = type;
+        this.navn = navn;
+        this.beskrivelse = beskrivelse;
+        this.belastning = belastning;
+        this.antallRep = antallRep;
+        this.antallSet = antallSet;
+        this.varighet = varighet;
+        this.distanse = distanse;
+    }
+
+    // For lagUtholdenhetsOvelse
+    public Exercise(String type, String navn, String beskrivelse, int varighet, int distanse){
+        this.type = type;
+        this.navn = navn;
+        this.beskrivelse = beskrivelse;
+        this.varighet = varighet;
+        this.distanse = distanse;
     }
 
     public void hentOvelse() {
@@ -26,9 +50,9 @@ public class Exercise extends Connector{
             switch (type) {
                 case "styrke":
                 case "kondisjon":
-                    res = stmt.executeQuery("SELECT navn, beskrivelse, belastning, antallRep, antallSet " +
+                    res = stmt.executeQuery("SELECT navn, beskrivelse, belastning, antallRep, antallSett " +
                                                  "FROM Ovelser NATURAL JOIN StyrkeKondisjon " +
-                                                 "WHERE ovelseId = " + ovelseId + ";");
+                                                 "WHERE ovelseId = '" + ovelseId + "';");
                     while (res.next()) {
                         this.navn = res.getString("navn");
                         this.beskrivelse = res.getString("beskrivelse");
@@ -39,46 +63,66 @@ public class Exercise extends Connector{
                     break;
                 case "utholdenhet":
                     res = stmt.executeQuery("SELECT navn, beskrivelse, varighet, distanse " +
-                                                 "FROM Ovelser NATURAL JOIN StyrkeKondisjon " +
-                                                 "WHERE ovelseId = " + ovelseId + ";");
+                                                 "FROM Ovelser NATURAL JOIN Utholdenhet " +
+                                                 "WHERE ovelseId = '" + ovelseId + "';");
                     while (res.next()) {
+                        this.navn = res.getString("navn");
+                        this.beskrivelse = res.getString("beskrivelse");
                         this.varighet = res.getInt("varighet");
                         this.distanse = res.getInt("distanse");
                     }
                     break;
                 default:
                     System.out.println(type + " is no valid type!");
-                    return;
             }
         } catch (Exception e) {
-            System.out.println("db error during select of ovelseId= "+e);
-            return;
+            System.out.println("db error during select of ovelse: " + e);
         }
 
     }
 
-    public void lagOvelse () throws Exception {
+    public void lagOvelse() throws Exception {
         try {
             Statement stmt = conn.createStatement();
-            ovelseId = stmt.executeUpdate("INSERT INTO Ovelse(navn, beskrivelse) " +
-                                               "VALUES('" + navn + "'," + beskrivelse + ");", Statement.RETURN_GENERATED_KEYS);
+            stmt.executeUpdate("INSERT INTO Ovelser (navn, beskrivelse) VALUES('" + navn + "','" + beskrivelse + "');", Statement.RETURN_GENERATED_KEYS);
+
+            // Get ovelseId from last insertion
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs.next()){
+                ovelseId=rs.getInt(1);
+            }
+            rs.close();
+
             switch (type) {
                 case "styrke":
                 case "kondisjon":
-                    stmt.executeQuery("INSERT INTO StyrkeKondisjon " +
-                                           "VALUES('" + belastning + "'," + antallRep + "," + antallSet + "," + ovelseId + ");");
+                    stmt.executeUpdate("INSERT INTO StyrkeKondisjon " +
+                                           "VALUES('" + belastning + "','" + antallRep + "','" + antallSet + "','"+ ovelseId + "');");
                     break;
                 case "utholdenhet":
-                    stmt.executeQuery("INSERT INTO Utholdenhet " +
-                            "VALUES('" + varighet + "'," + distanse + "," + ovelseId + ");");
+                    PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Utholdenhet VALUES (?, ?, ?)");
+
+                    // Check if values 'varighet' and 'distanse' should be NULL in the database
+                    if (varighet!= 0){
+                        pstmt.setInt(1, varighet);
+                    }else {
+                        pstmt.setNull(1, Types.INTEGER);
+                    }
+                    if (distanse != 0){
+                        pstmt.setInt(2, distanse);
+                    }else {
+                        pstmt.setNull(2, Types.INTEGER);
+                    }
+
+                    pstmt.setInt(3, ovelseId);
+                    pstmt.executeUpdate();
                     break;
                 default:
                     System.out.println(type + " is no valid type!");
-                    return;
             }
         }
         catch (Exception e) {
-            System.out.println("db error during insert of ovelseId="+e);
+            System.out.println("db error during insert of ovelse: " + e);
             throw new Exception();
         }
     }
@@ -153,5 +197,15 @@ public class Exercise extends Connector{
 
     public void setØvelsesGruppe(String øvelsesGruppe) {
         this.øvelsesGruppe = øvelsesGruppe;
+    }
+
+    public static void main(String[] args) throws Exception{
+//        Exercise ex = new Exercise("styrke", "Benkpress", "Vanlig benkpress på benk", 20, 10, 4);
+//        Exercise ex = new Exercise("utholdenhet", "3000 meter", "Løpe 3000 meter på bane", 0, 3000);
+        Exercise ex = new Exercise(27, "utholdenhet");
+        ex.connect();
+//        ex.lagOvelse();
+        ex.hentOvelse();
+        System.out.println("navn: " + ex.getNavn() + ", varighet: " + ex.getVarighet() + ", distanse: " + ex.getDistanse());
     }
 }

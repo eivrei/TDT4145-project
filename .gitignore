@@ -91,3 +91,4 @@ ENV/
 # User specific files
 .idea/*
 .DS_Store
+output/

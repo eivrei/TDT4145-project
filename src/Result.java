@@ -1,28 +1,41 @@
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.Time;
-import java.util.Date;
 
 
 public class Result extends Connector {
-
     private int belastning;
     private int antallRep;
-    private int antallSet;
+    private int antallSett;
     private int varighet;
     private int distanse;
     private int ovelseId;
-    private Date dato;
+    private String dato;
     private Time starttidspunkt;
     private String type;
 
-    public Result(int ovelseId, String type, Date dato, Time starttidspunkt) {
+    // For henteResultat
+    public Result(int ovelseId, String type, String dato, Time starttidspunkt) {
         this.ovelseId = ovelseId;
         this.type = type;
         this.dato = dato;
         this.starttidspunkt = starttidspunkt;
     }
 
+    // For lagResultat, styrke/kondisjon
+    public Result(int ovelseId, String type, String dato, Time starttidspunkt, int belastning, int antallRep, int antallSett){
+        this(ovelseId, type, dato, starttidspunkt);
+        this.belastning = belastning;
+        this.antallRep = antallRep;
+        this.antallSett = antallSett;
+    }
+
+    // For lagResultat, utholdenhet
+    public Result(int ovelseId, String type, String dato, Time starttidspunkt, int varighet, int distanse){
+        this(ovelseId, type, dato, starttidspunkt);
+        this.varighet = varighet;
+        this.distanse = distanse;
+    }
 
     public void hentResultat() {
         try {
@@ -31,19 +44,19 @@ public class Result extends Connector {
             switch (type) {
                 case "styrke":
                 case "kondisjon":
-                    res = stmt.executeQuery("select belastning, antallRep, antallSet from Resultat " +
-                                                 "where ovelseId=" + ovelseId + " and dato='" + dato +
-                                                 "'and starttidspunkt=" + starttidspunkt + ";");
+                    res = stmt.executeQuery("SELECT belastning, antallRep, antallSett FROM Resultat " +
+                                                 "WHERE ovelseId='" + ovelseId + "' AND dato='" + dato +
+                                                 "'AND starttidspunkt='" + starttidspunkt + "';");
                     while (res.next()) {
                         this.belastning = res.getInt("belastning");
                         this.antallRep = res.getInt("antallRep");
-                        this.antallSet = res.getInt("antallSet");
+                        this.antallSett = res.getInt("antallSett");
                     }
                     break;
                 case "utholdenhet":
-                    res = stmt.executeQuery("select varighet, distanse from Resultat " +
-                                                 "where ovelseId=" + ovelseId + " and dato='" + dato +
-                                                 "'and starttidspunkt=" + starttidspunkt + ";");
+                    res = stmt.executeQuery("SELECT varighet, distanse FROM Resultat " +
+                                                 "WHERE ovelseId='" + ovelseId + "' AND dato='" + dato +
+                                                 "'AND starttidspunkt='" + starttidspunkt + "';");
                     while (res.next()) {
                         this.varighet = res.getInt("varighet");
                         this.distanse = res.getInt("distanse");
@@ -51,11 +64,9 @@ public class Result extends Connector {
                     break;
                 default:
                     System.out.println(type + " is no valid type!");
-                    return;
             }
         } catch (Exception e) {
-            System.out.println("db error during select of Resultat= " + e);
-            return;
+            System.out.println("db error during select of Resultat: " + e);
         }
 
     }
@@ -66,22 +77,20 @@ public class Result extends Connector {
             switch (type) {
                 case "styrke":
                 case "kondisjon":
-                    stmt.executeUpdate("INSERT INTO Resultat (belastning, antallRep, antallSet, dato, starttidspunkt, ovelseId) " +
-                            "VALUES ('" + belastning + "'," + antallRep + ",'" + antallSet + "'," + dato +
-                            "," + starttidspunkt + "," + ovelseId + ");");
+                    stmt.executeUpdate("INSERT INTO Resultat (belastning, antallRep, antallSett, dato, starttidspunkt, ovelseId) " +
+                            "VALUES ('" + belastning + "','" + antallRep + "','" + antallSett + "','" + dato +
+                            "','" + starttidspunkt + "','" + ovelseId + "');");
                     break;
                 case "utholdenhet":
                     stmt.executeUpdate("INSERT INTO Resultat (varighet, distanse, dato, starttidspunkt, ovelseId) " +
-                            "VALUES ('" + varighet + "'," + distanse + "," + dato + "," + starttidspunkt +
-                            "," + ovelseId + ");");
+                            "VALUES ('" + varighet + "','" + distanse + "','" + dato + "','" + starttidspunkt +
+                            "','" + ovelseId + "');");
                     break;
                 default:
                     System.out.println(type + " is no valid type!");
-                    return;
             }
         } catch (Exception e) {
-            System.out.println("db error during insert of resultat=" + e);
-            return;
+            System.out.println("db error during insert of resultat: " + e);
         }
     }
 
@@ -101,12 +110,12 @@ public class Result extends Connector {
         this.antallRep = antallRep;
     }
 
-    public int getAntallSet() {
-        return antallSet;
+    public int getAntallSett() {
+        return antallSett;
     }
 
-    public void setAntallSet(int antallSet) {
-        this.antallSet = antallSet;
+    public void setAntallSett(int antallSett) {
+        this.antallSett = antallSett;
     }
 
     public int getOvelseId() {
@@ -131,5 +140,15 @@ public class Result extends Connector {
 
     public void setDistanse(int distanse) {
         this.distanse = distanse;
+    }
+
+    public static void main(String[] args) {
+//        Result result = new Result(1, "styrke", "2017-03-14", new Time(8, 00, 00), 20, 10, 4);
+//        Result result = new Result(12, "utholdenhet", "2017-03-14", new Time(8, 00, 00), 10, 3000);
+        Result result = new Result(1, "styrke", "2017-03-14", new Time(8, 0, 0));
+        result.connect();
+//        result.lagResultat();
+        result.hentResultat();
+        System.out.println(result.getAntallSett() + " | " + result.getAntallRep() + " | " + result.getBelastning());
     }
 }
