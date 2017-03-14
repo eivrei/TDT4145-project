@@ -8,7 +8,7 @@ public abstract class Connector {
     public void connect() {
         try {
             Class.forName("com.mysql.jdbc.Driver").newInstance();
-            // Properties for user and password. Here the user and password are both 'paulr'
+            // Properties for user and password.
             Properties p = new Properties();
             p.put("user", "eivindre_db");
             p.put("password", "Eivinderbest");
