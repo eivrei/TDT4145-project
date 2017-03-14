@@ -1,12 +1,6 @@
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+public class Exercise extends Connector{
 
-public class Exercise {
-
-    public int øvelsesId;
+    private int øvelsesId;
     private String navn;
     private String beskrivelse;
     private int belastning;
