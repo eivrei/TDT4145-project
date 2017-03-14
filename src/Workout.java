@@ -1,4 +1,3 @@
-
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.sql.Connection;
@@ -6,10 +5,7 @@ import java.sql.Statement;
 import java.sql.ResultSet;
 
 
-
-
-
-public class Workout{
+public class Workout extends Connector{
 
     private Date dato;
     private int varighet;
