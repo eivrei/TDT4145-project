@@ -1,5 +1,5 @@
 import java.util.Date;
-import java.text.SimpleDateFormat;
+import java.sql.Time;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
@@ -11,7 +11,7 @@ public class Workout extends Connector{
     private int varighet;
     private int personligform;
     private int prestasjon;
-    private String startTidspunkt;
+    private Time starttidspunkt;
     private String mal;
     private String maal;
     private String formal_tips;
@@ -21,18 +21,22 @@ public class Workout extends Connector{
     private String værForhold;
 
 
-    public Workout(Date date, String startTidspunkt) {
+    public Workout(Date date, Time startTidspunkt) {
         this.dato = date;
-        this.startTidspunkt = startTidspunkt;
+        this.starttidspunkt = startTidspunkt;
     }
 
-    public void initialize (Connection conn) {
+    public void HentTreningsokt (Connection conn) {
         try {
             Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("select dato, startTidspunkt from Treningsøkt where dato=" + dato);
+            ResultSet rs = stmt.executeQuery("select dato, starttidspunkt, personligform,varighet,prestasjon,from Treningsokt where dato=" + dato + " and starttidspunkt='" + starttidspunkt + "';");
             while (rs.next()) {
                 dato =  rs.getDate("dato");
-                startTidspunkt = rs.getString("startTidspunkt");
+                starttidspunkt = rs.getTime("startTidspunkt");
+                personligform=rs.getInt("personligform");
+                varighet=rs.getInt("varighet");
+                prestasjon=rs.getInt("prestasjon");
+
             }
 
         } catch (Exception e) {
@@ -42,17 +46,15 @@ public class Workout extends Connector{
 
     }
 
-    public void refresh (Connection conn) {
-        initialize (conn);
-    }
-
-    public String save (Connection conn) throws Exception {
+    public void lagTreningsokt (Connection conn) throws Exception {
         try {
             Statement stmt = conn.createStatement();
+            /*
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String fDato = formatter.format(dato);
-            stmt.executeUpdate("insert into Treningsøkt values ('"+fDato+"',"+varighet+",'"+personligform+"','"+formal_tips+"','"+mal+"','"+værForhold+"',"+temperatur+","+antTilskuere+",'"+luft_ventilasjon+"');");
-            return fDato;
+            */
+            stmt.executeUpdate("insert into Treningsokt values ('"+dato+"',"+varighet+",'"+personligform+"','"+formal_tips+"','"+mal+"','"+værForhold+"',"+temperatur+","+antTilskuere+",'"+luft_ventilasjon+"');");
+            return ;
         } catch (Exception e) {
             System.out.println("db error during insert of Treningsøkt="+e);
             throw new Exception();
@@ -92,12 +94,12 @@ public class Workout extends Connector{
         this.prestasjon = prestasjon;
     }
 
-    public String getStartTidspunkt() {
-        return startTidspunkt;
+    public Time getStartTidspunkt() {
+        return starttidspunkt;
     }
 
-    public void setStartTidspunkt(String startTidspunkt) {
-        this.startTidspunkt = startTidspunkt;
+    public void setStartTidspunkt(Time startTidspunkt) {
+        this.starttidspunkt = startTidspunkt;
     }
 
     public String getMal() {
