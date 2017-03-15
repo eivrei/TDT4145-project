@@ -4,7 +4,6 @@ import java.sql.Statement;
 import java.sql.Types;
 
 public class Exercise extends Connector{
-
     private int ovelseId;
     private String navn;
     private String beskrivelse;
@@ -22,7 +21,7 @@ public class Exercise extends Connector{
         this.type = type;
     }
 
-    // For lagStyrkeOvelse
+    // For lagOvelse, styrke/kondisjon
     public Exercise(String type, String navn, String beskrivelse, int belastning, int antallRep, int antallSet){
         this.type = type;
         this.navn = navn;
@@ -30,11 +29,9 @@ public class Exercise extends Connector{
         this.belastning = belastning;
         this.antallRep = antallRep;
         this.antallSet = antallSet;
-        this.varighet = varighet;
-        this.distanse = distanse;
     }
 
-    // For lagUtholdenhetsOvelse
+    // For lagOvelse, utholdenhet
     public Exercise(String type, String navn, String beskrivelse, int varighet, int distanse){
         this.type = type;
         this.navn = navn;
@@ -76,12 +73,10 @@ public class Exercise extends Connector{
                     System.out.println(type + " is no valid type!");
             }
             // Skriv ut resultat
-            System.out.println("Øvelse hentet\n" + "---------------------------------\n" + this.toString());
-
+            System.out.println(this.toString());
         } catch (Exception e) {
             System.out.println("db error during select of ovelse: " + e);
         }
-
     }
 
     public void lagOvelse() throws Exception {
@@ -100,7 +95,8 @@ public class Exercise extends Connector{
                 case "styrke":
                 case "kondisjon":
                     stmt.executeUpdate("INSERT INTO StyrkeKondisjon " +
-                                           "VALUES('" + belastning + "','" + antallRep + "','" + antallSet + "','"+ ovelseId + "');");
+                                           "VALUES('" + belastning + "','" + antallRep + "','" + antallSet + "','" +
+                                            ovelseId + "');");
                     break;
                 case "utholdenhet":
                     PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Utholdenhet VALUES (?, ?, ?)");
@@ -116,7 +112,6 @@ public class Exercise extends Connector{
                     }else {
                         pstmt.setNull(2, Types.INTEGER);
                     }
-
                     pstmt.setInt(3, ovelseId);
                     pstmt.executeUpdate();
                     break;
@@ -130,102 +125,59 @@ public class Exercise extends Connector{
         }
     }
 
-    public int getØvelses() {
+    public int getOvelseId() {
         return ovelseId;
-    }
-
-    public void setOvelseId(int øvelsesId) {
-        this.ovelseId = øvelsesId;
     }
 
     public String getNavn() {
         return navn;
     }
 
-    public void setNavn(String navn) {
-        this.navn = navn;
-    }
-
     public String getBeskrivelse() {
         return beskrivelse;
-    }
-
-    public void setBeskrivelse(String beskrivelse) {
-        this.beskrivelse = beskrivelse;
     }
 
     public int getBelastning() {
         return belastning;
     }
 
-    public void setBelastning(int belastning) {
-        this.belastning = belastning;
-    }
-
     public int getAntallRep() {
         return antallRep;
-    }
-
-    public void setAntallRep(int antallRep) {
-        this.antallRep = antallRep;
     }
 
     public int getAntallSet() {
         return antallSet;
     }
 
-    public void setAntallSet(int antallSet) {
-        this.antallSet = antallSet;
-    }
-
     public int getVarighet() {
         return varighet;
-    }
-
-    public void setVarighet(int varighet) {
-        this.varighet = varighet;
     }
 
     public int getDistanse() {
         return distanse;
     }
 
-    public void setDistanse(int distanse) {
-        this.distanse = distanse;
-    }
-
     public String getØvelsesGruppe() {
         return øvelsesGruppe;
-    }
-
-    public void setØvelsesGruppe(String øvelsesGruppe) {
-        this.øvelsesGruppe = øvelsesGruppe;
     }
 
     private String getType() {return this.type; }
 
     @Override
     public String toString() {
+        String s = "Øvelse hentet\n" + "---------------------------------\n" +
+                   "Navn: " + this.getNavn() + "\nType øvelse: " + this.getType() + "\nBeskrivelse: " +
+                   this.getBeskrivelse();
         switch (this.type){
             case "styrke":
             case "kondisjon":
-                return ("Navn: " + this.getNavn() + "\nType øvelse: " + this.getType() +  "\nBeskrivelse: "+ this.getBeskrivelse() + "\nBelastning: " + this.getBelastning() +
-                        "\nAntall Repetisjoner: " + this.getAntallRep() + "\nAntall Sett: " + this.getAntallSet());
+                return s + "Belastning: " + this.getBelastning() + "\nAntall Repetisjoner: " + this.getAntallRep() +
+                       "\nAntall Sett: " + this.getAntallSet();
             case "utholdenhet":
-                return ("Navn: " + this.getNavn() + "\nType øvelse: " + this.getType() + "\nBeskrivelse: " + this.getBeskrivelse() + "\nVarighet: " +
-                        this.getVarighet() + "\nDistanse: " + this.getDistanse());
+                return s + this.getBeskrivelse() + "\nVarighet: " + this.getVarighet() +
+                       "\nDistanse: " + this.getDistanse();
             default:
                 return "No data";
         }
-    }
-
-    public static void main(String[] args) throws Exception{
-//        Exercise ex = new Exercise("styrke", "Benkpress", "Vanlig benkpress på benk", 20, 10, 4);
-//        Exercise ex = new Exercise("utholdenhet", "3000 meter", "Løpe 3000 meter på bane", 0, 3000);
-        Exercise ex = new Exercise(27, "utholdenhet");
-        ex.connect();
-//        ex.lagOvelse();
-        ex.hentOvelse();
-        //System.out.println("navn: " + ex.getNavn() + ", varighet: " + ex.getVarighet() + ", distanse: " + ex.getDistanse());
     }
 }
