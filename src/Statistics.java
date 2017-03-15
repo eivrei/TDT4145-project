@@ -11,9 +11,10 @@ public class Statistics extends Connector{
                                                      "WHERE ovelseId='"+ovelseId+"' AND dato BETWEEN '"+startDato+
                                                      "' AND '"+sluttDato+"' AND belastning IS NOT NULL " +
                                                      "ORDER BY belastning ;");
+            System.out.println("{   Dato   | Belastning | Antall Repetisjoner | Antall Sett}");
             while (rs.next()){
-                System.out.println("{" + rs.getDate("dato") + "|" + rs.getInt("belastning") +
-                        "|" + rs.getInt("antallRep") + "|" + rs.getInt("antallSett") + "}");
+                System.out.println("{" + rs.getDate("dato") + "| " + String.format("%-11s",rs.getInt("belastning")) +
+                        "| " + String.format("%-20s",rs.getInt("antallRep")) + "| " + String.format("%-11s", rs.getInt("antallSett")) + "}");
             }
         }
         catch (SQLException e) {
@@ -28,9 +29,10 @@ public class Statistics extends Connector{
                                                      "WHERE ovelseId='"+ovelseId+"' AND dato BETWEEN '"+startDato+"' " +
                                                      "AND'"+sluttDato+"' AND distanse IS NOT NULL " +
                                                      "ORDER BY distanse ;");
+            System.out.println("{   Dato   | Varighet | Distanse}");
             while (rs.next()) {
-                System.out.println("{" + rs.getDate("dato") + "|" + rs.getInt("varighet") + "|"
-                                   + rs.getInt("distanse") + "}");
+                System.out.println("{" + rs.getDate("dato") + "| " + String.format("%-9s",rs.getInt("varighet")) + "| "
+                                   + String.format("%-8s",rs.getInt("distanse"))+ "}");
             }
         }
         catch (SQLException e) {
@@ -62,8 +64,8 @@ public class Statistics extends Connector{
     public static void main(String[] args) {
         Statistics test = new Statistics();
         test.connect();
-        test.getStatistics("2017.03.01","2017.04.01");
+        //test.getStatistics("2017.03.01","2017.04.01");
         test.getTopResultRunning(5, "2017.03.01", "2017.04.01");
-        test.getTopResultStrenght(2, "2017.03.01", "2017.04.01");
+        test.getTopResultStrenght(1, "2017.03.01", "2017.04.01");
     }
 }
