@@ -51,7 +51,7 @@ public class Exercise extends Connector{
                 case "styrke":
                 case "kondisjon":
                     res = stmt.executeQuery("SELECT navn, beskrivelse, belastning, antallRep, antallSett " +
-                                                 "FROM Ovelser NATURAL JOIN StyrkeKondisjon " +
+                                                 "FROM Ovelser JOIN StyrkeKondisjon ON id = ovelseId " +
                                                  "WHERE ovelseId = '" + ovelseId + "';");
                     if (res.next()) {
                         this.navn = res.getString("navn");
@@ -63,7 +63,7 @@ public class Exercise extends Connector{
                     break;
                 case "utholdenhet":
                     res = stmt.executeQuery("SELECT navn, beskrivelse, varighet, distanse " +
-                                                 "FROM Ovelser NATURAL JOIN Utholdenhet " +
+                                                 "FROM Ovelser JOIN Utholdenhet ON id = ovelseId " +
                                                  "WHERE ovelseId = '" + ovelseId + "';");
                     if (res.next()) {
                         this.navn = res.getString("navn");
@@ -75,7 +75,7 @@ public class Exercise extends Connector{
                 default:
                     System.out.println(type + " is no valid type!");
             }
-            // lag toString og kjør den her!!! TODO
+            // Skriv ut resultat
             System.out.println("Øvelse hentet\n" + "---------------------------------\n" + this.toString());
 
         } catch (Exception e) {

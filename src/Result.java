@@ -13,6 +13,7 @@ public class Result extends Connector {
     private String dato;
     private Time starttidspunkt;
     private String type;
+    private String ovelseNavn;
 
     // For henteResultat
     public Result(int ovelseId, String type, String dato, Time starttidspunkt) {
@@ -44,20 +45,22 @@ public class Result extends Connector {
             switch (type) {
                 case "styrke":
                 case "kondisjon":
-                    res = stmt.executeQuery("SELECT belastning, antallRep, antallSett FROM Resultat " +
+                    res = stmt.executeQuery("SELECT navn, belastning, antallRep, antallSett FROM Resultat JOIN Ovelser ON ovelseId = id " +
                                                  "WHERE ovelseId='" + ovelseId + "' AND dato='" + dato +
                                                  "'AND starttidspunkt='" + starttidspunkt + "';");
                     while (res.next()) {
+                        this.ovelseNavn = res.getString("navn");
                         this.belastning = res.getInt("belastning");
                         this.antallRep = res.getInt("antallRep");
                         this.antallSett = res.getInt("antallSett");
                     }
                     break;
                 case "utholdenhet":
-                    res = stmt.executeQuery("SELECT varighet, distanse FROM Resultat " +
+                    res = stmt.executeQuery("SELECT navn, varighet, distanse FROM Resultat JOIN Ovelser ON ovelseId = id " +
                                                  "WHERE ovelseId='" + ovelseId + "' AND dato='" + dato +
                                                  "'AND starttidspunkt='" + starttidspunkt + "';");
                     while (res.next()) {
+                        this.ovelseNavn = res.getString("navn");
                         this.varighet = res.getInt("varighet");
                         this.distanse = res.getInt("distanse");
                     }
@@ -65,6 +68,8 @@ public class Result extends Connector {
                 default:
                     System.out.println(type + " is no valid type!");
             }
+            // Skriv ut resultat
+            System.out.println("Resultat hentet\n" + "---------------------------------\n" + this.toString());
         } catch (Exception e) {
             System.out.println("db error during select of Resultat: " + e);
         }
@@ -140,6 +145,25 @@ public class Result extends Connector {
 
     public void setDistanse(int distanse) {
         this.distanse = distanse;
+    }
+
+    public String getOvelseNavn(){ return this.ovelseNavn; }
+
+    public String getDato() {
+        return dato;
+    }
+
+    @Override
+    public String toString() {
+        switch (this.type){
+            case "styrke":
+            case "kondisjon":
+                return ("Øvelse: " + this.getOvelseNavn() + "\nDato: " + this.getDato() + "\nBelastning: " + this.getBelastning() + "\nAntall repitisjoner: " + this.getAntallRep() +  "\nAntall sett: " + this.getAntallSett());
+            case "utholdenhet":
+                return ("Øvelse: " + this.getOvelseNavn() + "\nDato: " + this.getDato() + "\nVarighet: " + this.getVarighet() + "\nDistanse: " + this.getDistanse());
+            default:
+                return "No data";
+        }
     }
 
     public static void main(String[] args) {

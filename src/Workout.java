@@ -45,17 +45,17 @@ public class Workout extends Connector {
         // for lag treningsokt Innendors
 
 
-        public Workout(String dato,Time starttidspunkt, int varighet, int personligform, int prestasjon, String formal_tips, String type,int luft_ventilasjon, int antTilskuere) {
-            this.dato = dato;
-            this.varighet = varighet;
-            this.personligform = personligform;
-            this.prestasjon = prestasjon;
-            this.starttidspunkt = starttidspunkt;
-            this.formal_tips = formal_tips;
-            this.luft_ventilasjon = luft_ventilasjon;
-            this.antTilskuere = antTilskuere;
-            this.type = type;
-        }
+    public Workout(String dato,Time starttidspunkt, int varighet, int personligform, int prestasjon, String formal_tips, String type,int luft_ventilasjon, int antTilskuere) {
+        this.dato = dato;
+        this.varighet = varighet;
+        this.personligform = personligform;
+        this.prestasjon = prestasjon;
+        this.starttidspunkt = starttidspunkt;
+        this.formal_tips = formal_tips;
+        this.luft_ventilasjon = luft_ventilasjon;
+        this.antTilskuere = antTilskuere;
+        this.type = type;
+    }
 
     public void hentTreningsokt() {
         try {
@@ -91,7 +91,7 @@ public class Workout extends Connector {
                     System.out.println(type + " is no valid type!");
 
             }
-            // Lag en toString metode og kjør den her TODO
+            // Skriv ut resultat
             System.out.println("Treningsøkt hentet\n" + "--------------------------------\n" + this.toString());
 
         } catch (Exception e) {
