@@ -53,19 +53,19 @@ public class Exercise extends Connector{
                     res = stmt.executeQuery("SELECT navn, beskrivelse, belastning, antallRep, antallSett " +
                                                  "FROM Ovelser NATURAL JOIN StyrkeKondisjon " +
                                                  "WHERE ovelseId = '" + ovelseId + "';");
-                    while (res.next()) {
+                    if (res.next()) {
                         this.navn = res.getString("navn");
                         this.beskrivelse = res.getString("beskrivelse");
                         this.belastning = res.getInt("belastning");
                         this.antallRep = res.getInt("antallRep");
-                        this.antallSet = res.getInt("antallSet");
+                        this.antallSet = res.getInt("antallSett");
                     }
                     break;
                 case "utholdenhet":
                     res = stmt.executeQuery("SELECT navn, beskrivelse, varighet, distanse " +
                                                  "FROM Ovelser NATURAL JOIN Utholdenhet " +
                                                  "WHERE ovelseId = '" + ovelseId + "';");
-                    while (res.next()) {
+                    if (res.next()) {
                         this.navn = res.getString("navn");
                         this.beskrivelse = res.getString("beskrivelse");
                         this.varighet = res.getInt("varighet");
@@ -75,6 +75,9 @@ public class Exercise extends Connector{
                 default:
                     System.out.println(type + " is no valid type!");
             }
+            // lag toString og kjør den her!!! TODO
+            System.out.println(getNavn());
+
         } catch (Exception e) {
             System.out.println("db error during select of ovelse: " + e);
         }

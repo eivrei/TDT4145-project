@@ -69,7 +69,7 @@ public class Workout extends Connector {
 
             }
             switch (type){
-                case "Innendors":
+                case "innendors":
                     rs=stmt.executeQuery("SELECT luftVent,antallTilskuere FROM Innendors WHERE dato ='"+dato+"' AND starttidspunkt='"+starttidspunkt+"';");
                     while (rs.next()){
                         this.luft_ventilasjon=rs.getInt("luftVent");
@@ -78,7 +78,7 @@ public class Workout extends Connector {
                     }
                     break;
 
-                case "Utendors":
+                case "utendors":
                     rs=stmt.executeQuery("SELECT temp,vaertype FROM Utendors WHERE dato ='"+dato+"' AND starttidspunkt='"+starttidspunkt+"';");
                     while (rs.next()) {
                         this.temperatur=rs.getInt("temp");
@@ -91,7 +91,8 @@ public class Workout extends Connector {
                     System.out.println(type + " is no valid type!");
 
             }
-
+            // Lag en toString metode og kjør den her TODO
+            System.out.println(this.getVarighet());
 
         } catch (Exception e) {
             System.out.println("db error during select of treningsøkt= " + e);
@@ -102,26 +103,35 @@ public class Workout extends Connector {
 
     public void lagTreningsokt() throws Exception {
         try {
-            Statement stmt = conn.createStatement();
-            stmt.executeUpdate("INSERT INTO Treningsokt " + "VALUES ('"+dato+"','"+starttidspunkt+"','"+varighet+"','"+personligform+"','"+prestasjon+"','"+formal_tips+"')");
+            PreparedStatement stmt = conn.prepareStatement("INSERT INTO Treningsokt " + "VALUES (?, ?, ?, ?, ?, ?)");
+            stmt.setString(1, dato);
+            stmt.setTime(2, starttidspunkt);
+            stmt.setInt(3, varighet);
+            stmt.setInt(4, personligform);
+            stmt.setInt(5, prestasjon);
+            if(!formal_tips.equals("")){
+                stmt.setString(6, formal_tips);
+            }else {
+                stmt.setNull(6, Types.INTEGER);
+            }
+            stmt.executeUpdate();
 
 
             switch (type) {
-                case "Innendors":
+                case "innendors":
                     stmt.executeUpdate("INSERT INTO Innendors()" + "VALUES ('"+luft_ventilasjon+"','"+antTilskuere+"','"+dato+"','"+starttidspunkt+"')");
                     break;
-                case "Utendors":
+                case "utendors":
                     stmt.executeUpdate("INSERT INTO Utendors()"+"VALUES ('"+temperatur+"','"+værForhold+"','"+dato+"','"+starttidspunkt+"')");
                     break;
                 default:
                     System.out.println(type + " is no valid type!");
-                    return;
             }
 
 
         } catch (Exception e) {
-            System.out.println("db error during insert of Treningsøkt=" + e);
-            throw new Exception();
+            System.out.println("db error during insert of Treningsøkt: " + e);
+//            throw new Exception();
         }
     }
 
@@ -223,20 +233,20 @@ public class Workout extends Connector {
     }
 
 
-    public static void main(String[] args) throws Exception{
-
-
-        Time starttidspunkt=new Time(12,52,00);
-        //Workout workout=new Workout("2017-03-14",starttidspunkt,200,6,6,"bli i bedre form","Innendors",2,0);
-        Workout workout=new Workout("2017-03-14",starttidspunkt,"Innendors");
-        workout.connect();
-
-        //workout.lagTreningsokt();
-
-        workout.hentTreningsokt();
-        System.out.println(workout.getLuft());
-
-
-    }
+//    public static void main(String[] args) throws Exception{
+//
+//
+//        Time starttidspunkt=new Time(12,55,00);
+//        Workout workout=new Workout("2017-03-14",starttidspunkt,200,6,6,"","innendors",2,0);
+////        Workout workout=new Workout("2017-03-14",starttidspunkt,"Innendors");
+//        workout.connect();
+//
+//        workout.lagTreningsokt();
+//
+////        workout.hentTreningsokt();
+////        System.out.println(workout.getLuft());
+//
+//
+//    }
 
 }
