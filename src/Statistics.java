@@ -14,13 +14,15 @@ public class Statistics extends Connector{
             System.out.println("\n{   Dato   | Belastning | Antall Repetisjoner | Antall Sett}");
             int nr = 0;
             while (rs.next() && nr < 5){
-                System.out.println("{" + rs.getDate("dato") + "| " + String.format("%-11s",rs.getInt("belastning")) +
-                        "| " + String.format("%-20s",rs.getInt("antallRep")) + "| " + String.format("%-11s", rs.getInt("antallSett")) + "}");
+                System.out.println("{" + rs.getDate("dato") + "| " + 
+                                   String.format("%-11s",rs.getInt("belastning")) + "| " + 
+                                   String.format("%-20s",rs.getInt("antallRep")) + "| " +  
+                                   String.format("%-11s", rs.getInt("antallSett")) + "}");
                 nr ++;
             }
         }
         catch (SQLException e) {
-            System.out.println(e);
+            System.out.println("Error getting statistics:" + e);
         }
     }
 
@@ -34,8 +36,9 @@ public class Statistics extends Connector{
             System.out.println("\n{   Dato   | Varighet | Distanse}");
             int nr = 0;
             while (rs.next() && nr < 5) {
-                System.out.println("{" + rs.getDate("dato") + "| " + String.format("%-9s",rs.getInt("varighet")) + "| "
-                                   + String.format("%-8s",rs.getInt("distanse"))+ "}");
+                System.out.println("{" + rs.getDate("dato") + "| " + 
+                                   String.format("%-9s",rs.getInt("varighet")) + "| " + 
+                                   String.format("%-8s",rs.getInt("distanse"))+ "}");
                 nr ++;
             }
         }
@@ -48,14 +51,12 @@ public class Statistics extends Connector{
         try {
             Statement statement=conn.createStatement();
             ResultSet rs=statement.executeQuery("SELECT SUM(varighet), COUNT(*) FROM Treningsokt " +
-                                                     "WHERE dato BETWEEN '"+startDato+"' AND '"+sluttDato+"' ;");
-            int sumVarighet=0;
-            int antallOkter=0;
+                                                     "WHERE dato BETWEEN '" + startDato + "' AND '" + sluttDato + "' ;");
+            int sumVarighet = 0;
+            int antallOkter = 0;
             while(rs.next()) {
-                int i=rs.getInt(1);
-                int j=rs.getInt(2);
-                antallOkter += j;
-                sumVarighet+= i;
+                sumVarighet += rs.getInt(1);
+                antallOkter += rs.getInt(2);
             }
             System.out.println("\nI Perioden " + startDato + " til " + sluttDato + " har du trent i "
                                + sumVarighet +" minutter fordelt på " + antallOkter + " økter.");
@@ -63,13 +64,5 @@ public class Statistics extends Connector{
         catch (SQLException e) {
             System.out.println("Error getting statistics " + e);
         }
-    }
-
-    public static void main(String[] args) {
-        Statistics test = new Statistics();
-        test.connect();
-        //test.getStatistics("2017.03.01","2017.04.01");
-        test.getTopResultRunning(5, "2017.03.01", "2017.04.01");
-        test.getTopResultStrenght(1, "2017.03.01", "2017.04.01");
     }
 }

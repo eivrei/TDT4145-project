@@ -69,11 +69,10 @@ public class Result extends Connector {
                     System.out.println(type + " is no valid type!");
             }
             // Skriv ut resultat
-            System.out.println("Resultat hentet\n" + "---------------------------------\n" + this.toString());
+            System.out.println(this.toString());
         } catch (Exception e) {
             System.out.println("db error during select of Resultat: " + e);
         }
-
     }
 
     public void lagResultat() {
@@ -103,51 +102,29 @@ public class Result extends Connector {
         return belastning;
     }
 
-    public void setBelastning(int belastning) {
-        this.belastning = belastning;
-    }
-
     public int getAntallRep() {
         return antallRep;
-    }
-
-    public void setAntallRep(int antallRep) {
-        this.antallRep = antallRep;
     }
 
     public int getAntallSett() {
         return antallSett;
     }
 
-    public void setAntallSett(int antallSett) {
-        this.antallSett = antallSett;
-    }
-
     public int getOvelseId() {
         return ovelseId;
-    }
-
-    public void setOvelseId(int ovelseId) {
-        this.ovelseId = ovelseId;
     }
 
     public int getVarighet() {
         return varighet;
     }
 
-    public void setVarighet(int varighet) {
-        this.varighet = varighet;
-    }
-
     public int getDistanse() {
         return distanse;
     }
 
-    public void setDistanse(int distanse) {
-        this.distanse = distanse;
+    public String getOvelseNavn() {
+        return ovelseNavn;
     }
-
-    public String getOvelseNavn(){ return this.ovelseNavn; }
 
     public String getDato() {
         return dato;
@@ -155,24 +132,17 @@ public class Result extends Connector {
 
     @Override
     public String toString() {
+        String s = "Resultat hentet\n" + "---------------------------------\n" +
+                   "Øvelse: " + this.getOvelseNavn() + "\nDato: " + this.getDato();
         switch (this.type){
             case "styrke":
             case "kondisjon":
-                return ("Øvelse: " + this.getOvelseNavn() + "\nDato: " + this.getDato() + "\nBelastning: " + this.getBelastning() + "\nAntall repitisjoner: " + this.getAntallRep() +  "\nAntall sett: " + this.getAntallSett());
+                return s + "\nBelastning: " + this.getBelastning() + "\nAntall repitisjoner: " + this.getAntallRep() +
+                           "\nAntall sett: " + this.getAntallSett();
             case "utholdenhet":
-                return ("Øvelse: " + this.getOvelseNavn() + "\nDato: " + this.getDato() + "\nVarighet: " + this.getVarighet() + "\nDistanse: " + this.getDistanse());
+                return s + "\nVarighet: " + this.getVarighet() + "\nDistanse: " + this.getDistanse();
             default:
                 return "No data";
         }
-    }
-
-    public static void main(String[] args) {
-//        Result result = new Result(1, "styrke", "2017-03-14", new Time(8, 00, 00), 20, 10, 4);
-//        Result result = new Result(12, "utholdenhet", "2017-03-14", new Time(8, 00, 00), 10, 3000);
-        Result result = new Result(1, "styrke", "2017-03-14", new Time(8, 0, 0));
-        result.connect();
-//        result.lagResultat();
-        result.hentResultat();
-        System.out.println(result.getAntallSett() + " | " + result.getAntallRep() + " | " + result.getBelastning());
     }
 }
