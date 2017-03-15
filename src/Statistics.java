@@ -41,15 +41,18 @@ public class Statistics extends Connector{
     public void getStatistics(String startDato, String sluttDato) {
         try {
             Statement statement=conn.createStatement();
-            ResultSet rs=statement.executeQuery("SELECT SUM(varighet) FROM Treningsokt " +
+            ResultSet rs=statement.executeQuery("SELECT SUM(varighet), COUNT(*) FROM Treningsokt " +
                                                      "WHERE dato BETWEEN '"+startDato+"' AND '"+sluttDato+"' ;");
             int sumVarighet=0;
+            int antallOkter=0;
             while(rs.next()) {
                 int i=rs.getInt(1);
+                int j=rs.getInt(2);
+                antallOkter += j;
                 sumVarighet+= i;
             }
             System.out.println("I Perioden " + startDato + " til " + sluttDato + " har du trent i "
-                               + sumVarighet +" minutter.");
+                               + sumVarighet +" minutter fordelt på " + antallOkter + " økter.");
         }
         catch (SQLException e) {
             System.out.println("Error getting statistics " + e);
