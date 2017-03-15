@@ -267,6 +267,8 @@ public class Main {
                 case "7":
                     main.hentStatistikk(scanner);
                     break;
+                case "quit":
+                    break;
                 default:
                     System.out.println("Dette er ikke en gyldig operasjon...\n");
             }

@@ -11,10 +11,12 @@ public class Statistics extends Connector{
                                                      "WHERE ovelseId='"+ovelseId+"' AND dato BETWEEN '"+startDato+
                                                      "' AND '"+sluttDato+"' AND belastning IS NOT NULL " +
                                                      "ORDER BY belastning ;");
-            System.out.println("{   Dato   | Belastning | Antall Repetisjoner | Antall Sett}");
-            while (rs.next()){
+            System.out.println("\n{   Dato   | Belastning | Antall Repetisjoner | Antall Sett}");
+            int nr = 0;
+            while (rs.next() && nr < 5){
                 System.out.println("{" + rs.getDate("dato") + "| " + String.format("%-11s",rs.getInt("belastning")) +
                         "| " + String.format("%-20s",rs.getInt("antallRep")) + "| " + String.format("%-11s", rs.getInt("antallSett")) + "}");
+                nr ++;
             }
         }
         catch (SQLException e) {
@@ -29,10 +31,12 @@ public class Statistics extends Connector{
                                                      "WHERE ovelseId='"+ovelseId+"' AND dato BETWEEN '"+startDato+"' " +
                                                      "AND'"+sluttDato+"' AND distanse IS NOT NULL " +
                                                      "ORDER BY distanse ;");
-            System.out.println("{   Dato   | Varighet | Distanse}");
-            while (rs.next()) {
+            System.out.println("\n{   Dato   | Varighet | Distanse}");
+            int nr = 0;
+            while (rs.next() && nr < 5) {
                 System.out.println("{" + rs.getDate("dato") + "| " + String.format("%-9s",rs.getInt("varighet")) + "| "
                                    + String.format("%-8s",rs.getInt("distanse"))+ "}");
+                nr ++;
             }
         }
         catch (SQLException e) {
@@ -53,7 +57,7 @@ public class Statistics extends Connector{
                 antallOkter += j;
                 sumVarighet+= i;
             }
-            System.out.println("I Perioden " + startDato + " til " + sluttDato + " har du trent i "
+            System.out.println("\nI Perioden " + startDato + " til " + sluttDato + " har du trent i "
                                + sumVarighet +" minutter fordelt på " + antallOkter + " økter.");
         }
         catch (SQLException e) {
