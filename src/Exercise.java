@@ -76,7 +76,7 @@ public class Exercise extends Connector{
                     System.out.println(type + " is no valid type!");
             }
             // lag toString og kjør den her!!! TODO
-            System.out.println(getNavn());
+            System.out.println("Øvelse hentet\n" + "---------------------------------\n" + this.toString());
 
         } catch (Exception e) {
             System.out.println("db error during select of ovelse: " + e);
@@ -202,6 +202,23 @@ public class Exercise extends Connector{
         this.øvelsesGruppe = øvelsesGruppe;
     }
 
+    private String getType() {return this.type; }
+
+    @Override
+    public String toString() {
+        switch (this.type){
+            case "styrke":
+            case "kondisjon":
+                return ("Navn: " + this.getNavn() + "\nType øvelse: " + this.getType() +  "\nBeskrivelse: "+ this.getBeskrivelse() + "\nBelastning: " + this.getBelastning() +
+                        "\nAntall Repetisjoner: " + this.getAntallRep() + "\nAntall Sett: " + this.getAntallSet());
+            case "utholdenhet":
+                return ("Navn: " + this.getNavn() + "\nType øvelse: " + this.getType() + "\nBeskrivelse: " + this.getBeskrivelse() + "\nVarighet: " +
+                        this.getVarighet() + "\nDistanse: " + this.getDistanse());
+            default:
+                return "No data";
+        }
+    }
+
     public static void main(String[] args) throws Exception{
 //        Exercise ex = new Exercise("styrke", "Benkpress", "Vanlig benkpress på benk", 20, 10, 4);
 //        Exercise ex = new Exercise("utholdenhet", "3000 meter", "Løpe 3000 meter på bane", 0, 3000);
@@ -209,6 +226,6 @@ public class Exercise extends Connector{
         ex.connect();
 //        ex.lagOvelse();
         ex.hentOvelse();
-        System.out.println("navn: " + ex.getNavn() + ", varighet: " + ex.getVarighet() + ", distanse: " + ex.getDistanse());
+        //System.out.println("navn: " + ex.getNavn() + ", varighet: " + ex.getVarighet() + ", distanse: " + ex.getDistanse());
     }
 }

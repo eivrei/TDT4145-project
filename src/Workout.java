@@ -92,7 +92,7 @@ public class Workout extends Connector {
 
             }
             // Lag en toString metode og kjør den her TODO
-            System.out.println(this.getVarighet());
+            System.out.println("Treningsøkt hentet\n" + "--------------------------------\n" + this.toString());
 
         } catch (Exception e) {
             System.out.println("db error during select of treningsøkt= " + e);
@@ -232,21 +232,39 @@ public class Workout extends Connector {
         this.værForhold = værForhold;
     }
 
+    private String getType(){ return this.type; }
 
-//    public static void main(String[] args) throws Exception{
+    @Override
+    public String toString() {
+        switch (this.type){
+            case "innendors":
+                return ("Type treningsøkt: " + this.getType() + "\nDato: " + this.getDato() + "\nStarttidspunkt: " +
+                        this.getStartTidspunkt() + "\nVarighet: " + this.getVarighet() + "\nPersonlig form: " +
+                        this.getPersonligform() + "\nPrestasjon: " + this.getPrestasjon() + "\nFormål/Tips: " +
+                        this.getFormal() + "\nVentelesajon: " + this.getLuft() + "\nAntall tilskuere: " + this.getAntTilskuere());
+            case "utendors":
+                return ("Type treningsøkt: " + this.getType() + "Dato: " + this.getDato() + "\nStarttidspunkt: " +
+                        this.getStartTidspunkt() + "\nVarighet: " + this.getVarighet() + "\nPersonlig form: " +
+                        this.getPersonligform() + "\nPrestasjon: " + this.getPrestasjon() + "\nFormål/Tips: " +
+                        this.getFormal() + "\nTemperatur: " + this.getTemperatur() + "\nVær forhold: " + this.getVærForhold());
+            default:
+                return "No data";
+        }
+    }
+
+        public static void main(String[] args) throws Exception{
 //
-//
-//        Time starttidspunkt=new Time(12,55,00);
+          Time starttidspunkt=new Time(12,55,00);
 //        Workout workout=new Workout("2017-03-14",starttidspunkt,200,6,6,"","innendors",2,0);
-////        Workout workout=new Workout("2017-03-14",starttidspunkt,"Innendors");
-//        workout.connect();
+            Workout workout=new Workout("2017-03-14",starttidspunkt,"innendors");
+            workout.connect();
 //
 //        workout.lagTreningsokt();
 //
-////        workout.hentTreningsokt();
+            workout.hentTreningsokt();
 ////        System.out.println(workout.getLuft());
 //
 //
-//    }
+    }
 
 }

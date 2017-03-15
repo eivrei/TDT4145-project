@@ -127,15 +127,98 @@ public class Main {
     }
 
     public void registrerResultat(Scanner scanner){
+        System.out.print("Skriv inn øvelseID: ");
+        int ovelseID = Integer.parseInt(scanner.nextLine());
+        System.out.print("Skriv inn dato og starttidspunkt (yyyy-mm-dd hh:mm:ss): ");
+        String[] datoTid = scanner.nextLine().split(" ");
+        String dato = datoTid[0];
+        Time tid = new Time(Integer.parseInt(datoTid[1].split(":")[0]),
+                Integer.parseInt(datoTid[1].split(":")[1]),
+                Integer.parseInt(datoTid[1].split(":")[2]));
+        System.out.print("Skriv inn type treningsøkt (styrke | kondisjon | utholdenhet): ");
+        String type = scanner.nextLine().toLowerCase();
+        switch (type) {
+            case "styrke":
+            case "kondisjon":
+                System.out.print("Skriv inn belastning i kg: ");
+                int belastning = Integer.parseInt(scanner.nextLine());
+                System.out.print("Skriv inn antall repitisjoner: ");
+                int antallRep = Integer.parseInt(scanner.nextLine());
+                System.out.print("Skriv inn antall sett: ");
+                System.out.print("Skriv inn antall sett: ");
+                int antallSett = Integer.parseInt(scanner.nextLine());
+                Result kResult = new Result(ovelseID, type, dato, tid, belastning, antallRep, antallSett);
+                kResult.connect();
+                kResult.lagResultat();
+                break;
+            case "utholdenhet":
+                System.out.print("Skriv inn varighet i min: ");
+                int varighet = Integer.parseInt(scanner.nextLine());
+                System.out.print("Skriv inn distanse i meter: ");
+                int distanse = Integer.parseInt(scanner.nextLine());
+                Result uResult = new Result(ovelseID, type, dato, tid, varighet, distanse);
+                uResult.connect();
+                uResult.lagResultat();
+                break;
+            default:
+                System.out.println("Dette er ikke en gyldig type. Dumt valg, for nå må du skrive inn alt på nytt!\n\n");
+                registrerResultat(scanner);
+        }
 
     }
 
     public void hentResultat(Scanner scanner){
-
+        System.out.print("Skriv inn øvelseID: ");
+        int ovelseID = Integer.parseInt(scanner.nextLine());
+        System.out.print("Skriv inn dato og starttidspunkt (yyyy-mm-dd hh:mm:ss): ");
+        String[] datoTid = scanner.nextLine().split(" ");
+        String dato = datoTid[0];
+        Time tid = new Time(Integer.parseInt(datoTid[1].split(":")[0]),
+                Integer.parseInt(datoTid[1].split(":")[1]),
+                Integer.parseInt(datoTid[1].split(":")[2]));
+        System.out.print("Skriv inn type treningsøkt (styrke | kondisjon | utholdenhet): ");
+        String type = scanner.nextLine().toLowerCase();
+        switch (type){
+            case "styrke":
+            case "kondisjon":
+            case "utholdenhet":
+                Result result = new Result(ovelseID, type, dato, tid);
+                result.connect();
+                result.hentResultat();
+                break;
+            default:
+                System.out.println("Dette er ikke en gyldig type. Dumt valg, for nå må du skrive inn alt på nytt!\n\n");
+                hentResultat(scanner);
+        }
     }
 
     public void hentStatistikk(Scanner scanner){
-
+        System.out.print("Skriv inn start dato for perioden: ");
+        String startDato = scanner.nextLine();
+        System.out.print("Skriv inn slutt dato for perioden: ");
+        String sluttDato = scanner.nextLine();
+        System.out.print("Skriv inn typen statistikk du ønsker (topRunning | topStrenght | period): ");
+        String sType = scanner.nextLine();
+        Statistics stats = new Statistics();
+        stats.connect();
+        switch (sType){
+            case "topRunning":
+                System.out.print("Skriv inn øvelseID: ");
+                int runOvelseID = Integer.parseInt(scanner.nextLine());
+                stats.getTopResultRunning(runOvelseID, startDato, sluttDato);
+                break;
+            case "topStrenght":
+                System.out.print("Skriv inn øvelseID: ");
+                int strOvelseID = Integer.parseInt(scanner.nextLine());
+                stats.getTopResultStrenght(strOvelseID, startDato, sluttDato);
+                break;
+            case "period":
+                stats.getStatistics(startDato, sluttDato);
+                break;
+            default:
+                System.out.println("Vi har ikke noen statestikk for " + sType + " ennå, du får prøve en av de oppgitte alternativene.");
+                hentStatistikk(scanner);
+        }
     }
 
     public static void main(String[] args) throws Exception{
