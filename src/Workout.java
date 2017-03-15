@@ -1,13 +1,11 @@
+import java.sql.*;
 import java.util.Date;
-import java.sql.Time;
-import java.sql.Connection;
-import java.sql.Statement;
-import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
 
 
-public class Workout extends Connector{
+public class Workout extends Connector {
 
-    private Date dato;
+    private String dato;
     private int varighet;
     private int personligform;
     private int prestasjon;
@@ -19,55 +17,121 @@ public class Workout extends Connector{
     private int antTilskuere;
     private int temperatur;
     private String værForhold;
+    private String type;
 
 
-    public Workout(Date date, Time startTidspunkt) {
-        this.dato = date;
-        this.starttidspunkt = startTidspunkt;
+    // for Hent treningsokt
+
+    public Workout(String dato, Time starttidspunkt, String type) {
+        this.dato = dato;
+        this.starttidspunkt = starttidspunkt;
+        this.type = type;
     }
 
-    public void HentTreningsokt (Connection conn) {
+    //for lag treningsokt Utendors
+
+    public Workout(String dato, Time startTidspunkt, int varighet,int personligform,int prestasjon,String formal_tips,String type,int temperatur,String værForhold) {
+        this.dato = dato;
+        this.starttidspunkt = startTidspunkt;
+        this.type = type;
+        this.varighet = varighet;
+        this.personligform = personligform;
+        this.prestasjon = prestasjon;
+        this.formal_tips = formal_tips;
+        this.temperatur = temperatur;
+        this.værForhold = værForhold;
+    }
+
+        // for lag treningsokt Innendors
+
+
+        public Workout(String dato,Time starttidspunkt, int varighet, int personligform, int prestasjon, String formal_tips, String type,int luft_ventilasjon, int antTilskuere) {
+            this.dato = dato;
+            this.varighet = varighet;
+            this.personligform = personligform;
+            this.prestasjon = prestasjon;
+            this.starttidspunkt = starttidspunkt;
+            this.formal_tips = formal_tips;
+            this.luft_ventilasjon = luft_ventilasjon;
+            this.antTilskuere = antTilskuere;
+            this.type = type;
+        }
+
+    public void hentTreningsokt() {
         try {
             Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("select dato, starttidspunkt, personligform,varighet,prestasjon,from Treningsokt where dato=" + dato + " and starttidspunkt='" + starttidspunkt + "';");
+            ResultSet rs = stmt.executeQuery("select * from Treningsokt where dato='" + dato + "' and starttidspunkt='" + starttidspunkt + "';");
+
             while (rs.next()) {
-                dato =  rs.getDate("dato");
-                starttidspunkt = rs.getTime("startTidspunkt");
-                personligform=rs.getInt("personligform");
-                varighet=rs.getInt("varighet");
-                prestasjon=rs.getInt("prestasjon");
+                this.personligform = rs.getInt("form");
+                this.varighet = rs.getInt("varighet");
+                this.prestasjon = rs.getInt("prestasjon");
+
+            }
+            switch (type){
+                case "Innendors":
+                    rs=stmt.executeQuery("SELECT luftVent,antallTilskuere FROM Innendors WHERE dato ='"+dato+"' AND starttidspunkt='"+starttidspunkt+"';");
+                    while (rs.next()){
+                        this.luft_ventilasjon=rs.getInt("luftVent");
+                        this.antTilskuere=rs.getInt("antallTilskuere");
+
+                    }
+                    break;
+
+                case "Utendors":
+                    rs=stmt.executeQuery("SELECT temp,vaertype FROM Utendors WHERE dato ='"+dato+"' AND starttidspunkt='"+starttidspunkt+"';");
+                    while (rs.next()) {
+                        this.temperatur=rs.getInt("temp");
+                        this.værForhold=rs.getString("vaertype");
+
+                    }
+                    break;
+
+                default:
+                    System.out.println(type + " is no valid type!");
 
             }
 
+
         } catch (Exception e) {
-            System.out.println("db error during select of treningsøkt= "+e);
-            return;
+            System.out.println("db error during select of treningsøkt= " + e);
+
         }
 
     }
 
-    public void lagTreningsokt (Connection conn) throws Exception {
+    public void lagTreningsokt() throws Exception {
         try {
             Statement stmt = conn.createStatement();
-            /*
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String fDato = formatter.format(dato);
-            */
-            stmt.executeUpdate("insert into Treningsokt values ('"+dato+"',"+varighet+",'"+personligform+"','"+formal_tips+"','"+mal+"','"+værForhold+"',"+temperatur+","+antTilskuere+",'"+luft_ventilasjon+"');");
-            return ;
+            stmt.executeUpdate("INSERT INTO Treningsokt " + "VALUES ('"+dato+"','"+starttidspunkt+"','"+varighet+"','"+personligform+"','"+prestasjon+"','"+formal_tips+"')");
+
+
+            switch (type) {
+                case "Innendors":
+                    stmt.executeUpdate("INSERT INTO Innendors()" + "VALUES ('"+luft_ventilasjon+"','"+antTilskuere+"','"+dato+"','"+starttidspunkt+"')");
+                    break;
+                case "Utendors":
+                    stmt.executeUpdate("INSERT INTO Utendors()"+"VALUES ('"+temperatur+"','"+værForhold+"','"+dato+"','"+starttidspunkt+"')");
+                    break;
+                default:
+                    System.out.println(type + " is no valid type!");
+                    return;
+            }
+
+
         } catch (Exception e) {
-            System.out.println("db error during insert of Treningsøkt="+e);
+            System.out.println("db error during insert of Treningsøkt=" + e);
             throw new Exception();
         }
     }
 
 
-    public Date getDate(){
+    public String getDato() {
         return dato;
     }
 
-    public void setDate(Date date) {
-        this.dato=date;
+    public void setDate(String dato) {
+        this.dato = dato;
     }
 
     public int getVarighet() {
@@ -157,4 +221,22 @@ public class Workout extends Connector{
     public void setVærForhold(String værForhold) {
         this.værForhold = værForhold;
     }
+
+
+    public static void main(String[] args) throws Exception{
+
+
+        Time starttidspunkt=new Time(12,52,00);
+        //Workout workout=new Workout("2017-03-14",starttidspunkt,200,6,6,"bli i bedre form","Innendors",2,0);
+        Workout workout=new Workout("2017-03-14",starttidspunkt,"Innendors");
+        workout.connect();
+
+        //workout.lagTreningsokt();
+
+        workout.hentTreningsokt();
+        System.out.println(workout.getLuft());
+
+
+    }
+
 }
